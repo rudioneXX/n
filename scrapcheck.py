@@ -34,7 +34,7 @@ SOURCES = [
     ("http", "https://www.proxyrack.com/free-proxy-list?format=txt"),
     ("http", "https://free-proxy-list.net/?page=1&uptime=100&sort=uptime&order=desc&type=http"),
     ("http", "https://geonode.com/free-proxy-list?protocol=http#list"),
-    ("http", "https://proxylist.download/api/proxylist.txt?type=http",
+    ("http", "https://proxylist.download/api/proxylist.txt?type=http"),
     ("http", "https://raw.githubusercontent.com/jundymek/free-proxy/master/free-proxy.txt"),
     ("http", "https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt"),
     ("http", "https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/proxy.txt"),
