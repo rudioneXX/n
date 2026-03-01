@@ -1,0 +1,61 @@
+name: Home
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Every hour at the start of the hour
+  workflow_dispatch:  # Allow manual trigger
+
+permissions:
+  contents: write  # Write permission for modifying repository contents
+  actions: write   # Write permission for actions
+
+jobs:
+  scrape-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}  # Authentication token
+
+      # Step 2: Configure Git
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      # Step 3: Setup Python 3.11
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Step 4: Install Python dependencies
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      # Step 5: Run the combined proxy scraper and checker (scrapcheck.py)
+      - name: Run scrapcheck.py
+        run: python -u scrapcheck.py
+
+      # Step 6: Generate commit message
+      - name: Generate commit message
+        id: commit_msg
+        run: |
+          COMMIT_MESSAGE="🚀 lo: $(date -u '+%Y-%m-%d %H:%M UTC')"
+          echo "commit_msg=$COMMIT_MESSAGE" >> $GITHUB_OUTPUT
+        shell: bash
+
+      # Step 7: Commit and push the updated proxies
+      - name: Commit updated proxies
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: ${{ steps.commit_msg.outputs.commit_msg }}
+          file_pattern: "scraped/*.txt checked/*.txt"  # Files to be committed
+          add_options: "--all"  # Add all changes (including new files)
+          branch: main
+          push_options: "--force"  # Push changes to the main branch
+          skip_dirty_check: false  # Skip checking for uncommitted changes
